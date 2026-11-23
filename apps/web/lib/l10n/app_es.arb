@@ -1,0 +1,471 @@
+{
+  "@@locale": "es",
+  "appTitle": "KiuPop",
+  "tagline": "Tu tienda empieza con una idea.",
+  "welcomeSubtitle": "Kiu entiende lo que vendés, te hace unas pocas preguntas y crea una tienda preciosa, lista para compartir y recibir pedidos por WhatsApp.",
+  "welcomeStep1": "Entrá con Google o tu correo en un clic.",
+  "welcomeStep2": "Contale a Kiu qué vendés, con tus palabras.",
+  "welcomeStep3": "Mirá tu tienda inflarse… ¡POP! Compartila y recibí pedidos.",
+  "createStoreCta": "Crear mi tienda",
+  "haveStoreCta": "Ya tengo cuenta",
+  "seeDemoStore": "Ver una tienda de ejemplo",
+  "back": "Volver",
+  "close": "Cerrar",
+  "retry": "Reintentar",
+  "show": "Mostrar",
+  "hide": "Ocultar",
+  "createStoreTitle": "Crea tu tienda",
+  "createStoreIntro": "Solo necesitamos dos datos. Podrás cambiar todo después.",
+  "storeNameLabel": "Nombre del negocio",
+  "storeNameHint": "Ej.: Flores de Occidente",
+  "storeNameError": "Escribe el nombre de tu negocio (mínimo 2 letras).",
+  "whatsappLabel": "WhatsApp para recibir pedidos",
+  "whatsappHelper": "Número de Costa Rica (8 dígitos) o internacional con +",
+  "whatsappError": "Escribe un número de WhatsApp válido.",
+  "storeDescriptionLabel": "Descripción (opcional)",
+  "storeDescriptionHint": "¿Qué vendes? ¿Dónde estás?",
+  "createStoreSubmit": "Crear mi tienda",
+  "storeReadyTitle": "¡Tu tienda está lista!",
+  "storeReadyBody": "{name} ya tiene su catálogo. Este es tu enlace público:",
+  "@storeReadyBody": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "credentialTitle": "Guarda tu clave de administrador",
+  "credentialWarning": "Con esta clave vuelves a editar tu tienda. Guárdala en un lugar seguro: no la mostraremos de nuevo y en esta versión no se puede recuperar.",
+  "copyCredential": "Copiar clave",
+  "credentialCopied": "Clave copiada. Guárdala en un lugar seguro.",
+  "credentialSavedCheck": "Ya guardé mi clave",
+  "continueToProducts": "Continuar a mis productos",
+  "loginTitle": "Entrar a mi tienda",
+  "loginIntro": "Pega la clave de administrador que guardaste al crear tu tienda.",
+  "credentialLabel": "Clave de administrador",
+  "credentialInvalid": "La clave no es válida. Revisa que la copiaste completa.",
+  "loginSubmit": "Entrar",
+  "loginRecoveryNote": "¿Perdiste tu clave? En esta versión de prueba no se puede recuperar.",
+  "signOut": "Salir",
+  "tabProducts": "Productos",
+  "tabMyStore": "Mi tienda",
+  "addProduct": "Agregar producto",
+  "loadProductsError": "No pudimos cargar tus productos",
+  "noProductsTitle": "Agrega tu primer producto",
+  "noProductsBody": "Toca «Agregar producto». Con tres productos ya puedes compartir tu tienda.",
+  "productsCount": "{count, plural, =1{1 producto} other{{count} productos}}",
+  "@productsCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "visibleInStore": "Visible en tu tienda",
+  "hiddenFromStore": "Oculto",
+  "availableToggle": "Mostrar {name} en la tienda",
+  "@availableToggle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "productShown": "El producto ahora se ve en tu tienda.",
+  "productHidden": "El producto quedó oculto.",
+  "newProductTitle": "Nuevo producto",
+  "editProductTitle": "Editar producto",
+  "productNameLabel": "Nombre",
+  "productNameError": "Escribe el nombre del producto.",
+  "priceLabel": "Precio en colones",
+  "priceHelper": "Solo números, sin decimales. Ej.: 2000",
+  "priceError": "Escribe un precio mayor que cero.",
+  "productDescriptionLabel": "Descripción",
+  "addPhoto": "Agregar foto",
+  "changePhoto": "Cambiar foto",
+  "photoHelper": "JPG, PNG o WebP, hasta 5 MB.",
+  "saveProduct": "Guardar producto",
+  "productSaved": "Producto guardado.",
+  "photoUploadFailed": "El producto se guardó, pero la foto no: {reason}",
+  "@photoUploadFailed": {
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "aiIntro": "Escribe con tus palabras qué vendes y te proponemos un nombre y una descripción. Tú decides qué usar.",
+  "aiDisabled": "KiuPop AI no está disponible en este entorno. Puedes escribir la descripción tú mismo.",
+  "aiNoteHint": "Ej.: Rosa roja natural para regalo",
+  "improveWithAi": "Mejorar con IA",
+  "aiWorking": "Pensando…",
+  "aiNeedsText": "Escribe primero algo sobre tu producto.",
+  "aiProposal": "Propuesta de KiuPop AI",
+  "aiPriceUntouched": "El precio no lo cambia la IA: lo pones tú.",
+  "aiUse": "Usar esta propuesta",
+  "aiDiscard": "Descartar",
+  "aiAccepted": "Listo. Revisa y edita el texto antes de guardar.",
+  "yourLink": "Tu enlace público",
+  "viewMyStore": "Ver mi tienda",
+  "copyLink": "Copiar enlace",
+  "linkCopied": "Enlace copiado.",
+  "shareWhatsApp": "Compartir por WhatsApp",
+  "shareMessage": "¡Mira el catálogo de {store}! Haz tu pedido aquí: {link}",
+  "@shareMessage": {
+    "placeholders": {
+      "store": {
+        "type": "String"
+      },
+      "link": {
+        "type": "String"
+      }
+    }
+  },
+  "catalogPreview": "Así se ve tu catálogo",
+  "catalogPreviewEmpty": "Todavía no hay productos visibles.",
+  "storeNotFound": "No encontramos esta tienda",
+  "storeNotFoundBody": "Revisa el enlace que te compartieron.",
+  "loadCatalogError": "No pudimos cargar el catálogo",
+  "catalogEmpty": "Pronto habrá productos aquí",
+  "catalogEmptyBody": "Esta tienda todavía no tiene productos disponibles.",
+  "addToCart": "Agregar",
+  "decrease": "Quitar uno de {name}",
+  "@decrease": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "increase": "Agregar uno de {name}",
+  "@increase": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "cartItems": "{count, plural, =1{Ver pedido · 1 producto} other{Ver pedido · {count} productos}}",
+  "@cartItems": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "yourOrder": "Tu pedido",
+  "cartEmpty": "Tu pedido está vacío.",
+  "subtotal": "Subtotal",
+  "total": "Total",
+  "orderDisclaimer": "El comercio confirma disponibilidad y precio final por WhatsApp. Aún no se ha realizado ningún pago.",
+  "orderWhatsApp": "Pedir por WhatsApp",
+  "orderPrepared": "Abrimos WhatsApp con tu pedido listo. Envíalo para que el comercio lo confirme.",
+  "whatsappOpenFailed": "No pudimos abrir WhatsApp. Revisa que tu navegador permita ventanas emergentes.",
+  "errorOffline": "No hay conexión con KiuPop. Revisa tu internet e intenta de nuevo.",
+  "errorTimeout": "KiuPop tardó demasiado en responder. Intenta de nuevo.",
+  "errorGeneric": "Algo salió mal. Intenta de nuevo.",
+  "kiuLoginTitle": "Creá tu tienda con Kiu",
+  "loginSubtitle": "Entrá en un clic y empezamos a conversar.",
+  "loginEmulatorNotice": "Modo local: cuentas de prueba del emulador. No uses tu contraseña real.",
+  "loginDisabledNotice": "El inicio de sesión no está configurado en este entorno.",
+  "loginGoogle": "Continuar con Google",
+  "loginFacebook": "Continuar con Facebook",
+  "loginFacebookSoon": "Facebook (pronto)",
+  "loginFacebookPending": "Se activa cuando la app de Meta esté configurada.",
+  "loginOrEmail": "o con tu correo",
+  "loginEmail": "Correo",
+  "loginPassword": "Contraseña",
+  "loginPasswordHelp": "Mínimo 6 caracteres.",
+  "loginCreateAccount": "Crear cuenta",
+  "loginSignIn": "Entrar",
+  "loginHaveAccount": "Ya tengo cuenta · Entrar",
+  "loginNoAccount": "No tengo cuenta · Crear una",
+  "loginLegacyKey": "Entrar con una clave kp_ (tiendas del POC)",
+  "authInvalidCredentials": "El correo o la contraseña no coinciden.",
+  "authEmailInUse": "Ese correo ya tiene cuenta. Tocá «Entrar».",
+  "authWeakPassword": "Usá al menos 6 caracteres.",
+  "authInvalidEmail": "Escribí un correo válido.",
+  "authProviderDisabled": "Este método de ingreso no está habilitado todavía.",
+  "authNetwork": "Sin conexión. Revisá tu internet e intentá de nuevo.",
+  "authUnknown": "No pudimos iniciar sesión. Intentá de nuevo.",
+  "kiuPopWord": "¡POP!",
+  "kiuSemantic": "Kiu, el asistente de KiuPop",
+  "kiuThinking": "Kiu está pensando…",
+  "kiuLoadError": "No pudimos abrir tu conversación con Kiu",
+  "aiModeClaude": "IA",
+  "aiModeLocal": "Modo local",
+  "aiModeClaudeHelp": "Kiu usa un modelo de IA para entenderte.",
+  "aiModeLocalHelp": "Sin IA conectada: Kiu usa reglas locales y nunca inventa datos.",
+  "stageListening": "Kiu te escucha",
+  "stageBuilding": "Armando tu tienda… {percent}%",
+  "@stageBuilding": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "stageReady": "¡Tu tienda está lista!",
+  "stagePublished": "Tu tienda está publicada",
+  "skipAnimation": "Saltar animación",
+  "seePreview": "Ver vista previa",
+  "taskDone": "listo",
+  "taskRunning": "en proceso",
+  "taskNeedsInput": "necesita tu respuesta",
+  "taskSkipped": "omitido",
+  "taskFailed": "no se pudo completar",
+  "taskPending": "pendiente",
+  "composerHintFirst": "Ej.: Soy Florería Bella, vendo flores y arreglos…",
+  "composerHintAnswer": "Escribí tu respuesta…",
+  "skipQuestion": "Omitir esta pregunta",
+  "send": "Enviar",
+  "publishCta": "Publicar mi tienda",
+  "publishConfirmTitle": "¿Publicamos tu tienda?",
+  "publishConfirmBody": "Cualquier persona con el enlace podrá verla y hacerte pedidos por WhatsApp. Los pagos en línea reales siguen apagados.",
+  "publishConfirmCta": "Sí, publicar",
+  "publishFailed": "No pudimos publicar. Intentá de nuevo.",
+  "previewTitle": "Vista previa",
+  "previewDraft": "Vista previa · aún no es pública",
+  "previewPublished": "Así ven tu tienda tus clientes",
+  "previewEmpty": "Contale a Kiu sobre tu negocio y acá vas a ver tu tienda.",
+  "previewBuilding": "Kiu está armando tu tienda…",
+  "shareTitle": "¡Compartí tu tienda!",
+  "shareText": "Mirá la tienda de {name}",
+  "@shareText": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "share": "Compartir",
+  "openMyStore": "Ver mi tienda",
+  "addPhotosInAdmin": "Agregar fotos y editar",
+  "noStoreYet": "Todavía no tenés una tienda",
+  "noStoreYetBody": "Contale a Kiu sobre tu negocio y la creamos en minutos.",
+  "createWithKiu": "Crear con Kiu",
+  "cancel": "Cancelar",
+  "sfCatalog": "Catálogo",
+  "sfFeatured": "Destacados",
+  "sfWriteWhatsApp": "Escribir por WhatsApp",
+  "sfAvailableWhenPublished": "WhatsApp (al publicar)",
+  "sfDelivery": "Entregas",
+  "sfDeliveryHome": "Entrega a domicilio",
+  "sfDeliveryPickup": "Retiro disponible",
+  "sfDeliveryCoordinate": "Coordinamos la entrega por WhatsApp.",
+  "sfPaymentsToCoordinate": "Pagos a coordinar: {methods}",
+  "@sfPaymentsToCoordinate": {
+    "placeholders": {
+      "methods": {
+        "type": "String"
+      }
+    }
+  },
+  "sfRealPaymentsPending": "Pagos en línea reales: pendientes de activar.",
+  "sfContact": "Contacto",
+  "sfMadeWith": "Hecho con KiuPop",
+  "sfDraftBadge": "Vista previa · borrador",
+  "sfTestCheckout": "Pagar en línea (prueba)",
+  "checkoutTitle": "Pago de prueba",
+  "checkoutTestNotice": "Modo de prueba: no se cobra dinero real.",
+  "checkoutSimulateApprove": "Simular pago aprobado",
+  "checkoutSimulateDecline": "Simular rechazo",
+  "checkoutApproved": "Pago de prueba aprobado",
+  "checkoutDeclined": "Pago de prueba rechazado",
+  "checkoutNoRealMoney": "No se cobró dinero real. El comercio confirma tu pedido por WhatsApp.",
+  "catFlores": "Flores",
+  "catReposteria": "Repostería",
+  "catComida": "Comida",
+  "catRopa": "Ropa",
+  "catBelleza": "Belleza",
+  "catArtesania": "Artesanía",
+  "catMascotas": "Mascotas",
+  "catPlantas": "Plantas",
+  "catTecnologia": "Tecnología",
+  "catOtro": "Tienda",
+  "createAnotherStore": "Crear otra tienda",
+  "attachFiles": "Compartir fotos o tu catálogo (Excel, CSV, texto o PDF)",
+  "fileTooMany": "{name}: ya compartiste el máximo de archivos.",
+  "fileTooBig": "{name}: es demasiado grande (máximo 20 MB).",
+  "uploadingFiles": "Subiendo {count, plural, =1{1 archivo} other{{count} archivos}}…",
+  "fileReceived": "recibido",
+  "fileProcessing": "procesando",
+  "fileProcessed": "listo",
+  "fileNeedsReview": "revisar",
+  "fileError": "error",
+  "@fileTooMany": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@fileTooBig": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "@uploadingFiles": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "googleTestTitle": "Cuenta de Google de prueba",
+  "googleTestBody": "Modo local: el emulador crea una cuenta de prueba. No se usa ninguna cuenta real de Google.",
+  "googleTestName": "Nombre",
+  "micStart": "Dictar (tu navegador transcribe; no guardamos audio)",
+  "micStop": "Detener dictado",
+  "micDenied": "Activá el permiso del micrófono para dictar. También podés escribir.",
+  "micError": "No pude escucharte. Probá de nuevo o escribime.",
+  "uploadCatalog": "Subir catálogo (Excel, CSV o texto)",
+  "themeSystem": "Tema: automático (según tu dispositivo)",
+  "themeLight": "Tema: claro",
+  "themeDark": "Tema: oscuro",
+  "kiuSaid": "Kiu dijo",
+  "youSaid": "Tú dijiste",
+  "scrollToLatest": "Ir al último mensaje",
+  "welcomeLead": "Contásela a Kiu y mirá cómo se convierte en una tienda lista para compartir.",
+  "loginHowItWorks": "Así funciona",
+  "loginJustLooking": "¿Solo querés mirar? Ver una tienda de ejemplo",
+  "settingsTitle": "Ajustes",
+  "themeShortSystem": "Automático",
+  "themeShortLight": "Claro",
+  "themeShortDark": "Oscuro",
+  "themeLabel": "Apariencia",
+  "kiuBrainLabel": "Cómo piensa Kiu",
+  "stageListeningHint": "Contame qué vendés y cómo se llama tu negocio.",
+  "stageBuildingHint": "Kiu arma tu catálogo con lo que le contaste.",
+  "stageReadyHint": "Mirala antes de publicarla. Vos decidís cuándo.",
+  "stagePublishedHint": "Ya podés compartirla y recibir pedidos.",
+  "kiuDiagnosis": "Diagnóstico de Kiu",
+  "paywallTestBadge": "Modo demostración",
+  "paywallTitle": "Tu tienda está lista para dar el siguiente paso.",
+  "paywallLead": "Ya tenés el diseño, el catálogo y los productos organizados. Activá KiuPop para compartir tu tienda y empezar a recibir oportunidades de venta.",
+  "paywallPerMonth": " / mes",
+  "paywallPerStore": "por tienda activa. Si la pausas, no pagas.",
+  "paywallIncludesLink": "Enlace público para compartir en redes",
+  "paywallIncludesWhatsApp": "Pedidos directo a tu WhatsApp",
+  "paywallIncludesQr": "Catálogo con link y código QR",
+  "paywallTestCard": "Tarjeta de prueba •••• 4242",
+  "paywallFreeNote": "Ver y ajustar tu tienda con Kiu no tiene costo.",
+  "paywallPayCta": "Pagar {price} y publicar",
+  "paywallPaying": "Simulando activación…",
+  "paywallLater": "Ahora no",
+  "paywallFailed": "No pudimos activar tu plan. Intenta de nuevo.",
+  "paywallActivated": "Activación de prueba lista: no se cargó ningún monto. Publicando tu tienda…",
+  "@paywallPayCta": {
+    "placeholders": {
+      "price": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceTitle": "Hablar con Kiu",
+  "voiceIdleHint": "Contame qué vendés, cómo se llama tu negocio y tus precios. Hasta {seconds} segundos.",
+  "@voiceIdleHint": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceTapToRecord": "Tocá para grabar",
+  "voiceStart": "Empezar a grabar",
+  "voiceStop": "Detener grabación",
+  "voiceRecording": "Grabando…",
+  "voiceDiscard": "Descartar",
+  "voicePlay": "Escuchar",
+  "voicePause": "Pausar",
+  "voiceRerecord": "Grabar de nuevo",
+  "voiceDelete": "Eliminar",
+  "voiceTranscribe": "Transcribir",
+  "voiceTranscribing": "Kiu está escuchando tu audio…",
+  "voiceReviewTitle": "Esto entendí",
+  "voiceReviewHint": "Corregí nombres, precios o cantidades si hace falta. Kiu recibe solo este texto.",
+  "voiceTranscriptLabel": "Tu idea, en texto",
+  "voiceSend": "Enviar a Kiu",
+  "voiceWriteInstead": "Prefiero escribir",
+  "voicePermissionDenied": "Necesito permiso para usar el micrófono. Activalo en la configuración del navegador o del teléfono, o escribime.",
+  "voiceMicError": "No pude usar el micrófono. Probá de nuevo o escribime.",
+  "voiceTooShort": "El audio quedó muy corto. Contame un poco más.",
+  "voiceEmptyTranscript": "Escribí o corregí el texto antes de enviarlo.",
+  "voiceProvider": "Transcripción con {provider}. El audio no se guarda.",
+  "@voiceProvider": {
+    "placeholders": {
+      "provider": {
+        "type": "String"
+      }
+    }
+  },
+  "voiceUnavailable": "La transcripción de audio no está disponible ahora. Podés escribirle a Kiu.",
+  "intakeTitle": "¿Cómo querés contarle tu idea a Kiu?",
+  "intakeFree": "Contame qué imaginás. Crear tu primera propuesta no tiene costo.",
+  "intakeVoiceTitle": "Hablar con Kiu",
+  "intakeVoiceBody": "Grabá un audio y contame qué vendés. Yo me encargo del resto.",
+  "intakeTextTitle": "Escribir mi idea",
+  "intakeTextBody": "Escribí una descripción de tu negocio.",
+  "intakeVoiceOff": "Audio no disponible ahora",
+  "revealTitle": "¡POP! Tu tienda ya tomó forma.",
+  "revealBody": "Kiu organizó tu negocio y preparó una tienda diseñada para vos.",
+  "revealExplore": "Explorar mi tienda",
+  "revealAdjust": "Hacer un ajuste",
+  "revealContinue": "Continuar",
+  "adjustHint": "Contale a Kiu qué querés cambiar: colores, nombres, precios…",
+  "uploadSending": "Subiendo {name}…",
+  "@uploadSending": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "uploadCancel": "Cancelar subida de {name}",
+  "@uploadCancel": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "uploadRetry": "Reintentar",
+  "uploadRemove": "Quitar",
+  "uploadCancelled": "{name}: subida cancelada.",
+  "@uploadCancelled": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "fileTooManyTotal": "{name}: con este archivo superás los {mb} MB por tienda.",
+  "@fileTooManyTotal": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "mb": {
+        "type": "int"
+      }
+    }
+  },
+  "voiceNote": "Nota de voz",
+  "paywallDemoNotice": "Modo demostración. KiuPop todavía no procesa suscripciones ni cobros reales. Esta activación es simulada y no se cargará ningún monto.",
+  "paywallPlanName": "Plan de demostración",
+  "paywallPriceNote": "Precio de referencia para la demo. No se cobra.",
+  "paywallIncludedTitle": "Incluido hoy",
+  "paywallBenefitCatalog": "Catálogo público",
+  "paywallBenefitLinks": "Enlaces compartibles",
+  "paywallBenefitCart": "Carrito",
+  "paywallBenefitWhatsApp": "Pedidos por WhatsApp",
+  "paywallBenefitAdmin": "Administración de productos",
+  "paywallBenefitDesign": "Personalización visual",
+  "paywallBenefitKiu": "Asistencia de Kiu",
+  "paywallSoonTitle": "Próximamente",
+  "paywallSoonPayments": "Pagos en línea reales",
+  "paywallSoonIntegrations": "Integraciones avanzadas",
+  "paywallSimulateCta": "Simular activación"
+}

@@ -1,0 +1,1336 @@
+openapi: 3.1.0
+info:
+  title: KiuPop API
+  version: 0.3.1
+  description: |
+    Contrato HTTP entre la app Flutter y la API Go de KiuPop.
+    Fuente única de verdad: cualquier endpoint nuevo se declara aquí primero.
+    Los endpoints /api/v1/demo/* existen solo con MOCK_MODE=true (local/development).
+    Endpoints /api/v1/admin/* aceptan `Authorization: Bearer <ID token de KiuPop>` (la tienda la
+    resuelve el servidor a partir del dueño autenticado) o, por compatibilidad con el POC,
+    `Bearer kp_...` (credencial de la tienda). Nunca van en la URL.
+    Endpoints /api/v1/me y /api/v1/agent/* requieren el ID token (Firebase Auth de KiuPop o su emulador local).
+    La única excepción es /api/v1/agent/stream, que usa un ticket opaco de 10 minutos ligado al usuario
+    y a la sesión (EventSource no puede enviar encabezados).
+servers:
+  - url: http://localhost:8080
+    description: Local (Docker Compose)
+paths:
+  /healthz:
+    get:
+      operationId: getHealth
+      summary: Liveness del proceso
+      responses:
+        "200":
+          description: Proceso activo
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Health" }
+              example: { $ref: "./examples/healthz.json" }
+  /readyz:
+    get:
+      operationId: getReadiness
+      summary: Readiness (verifica PostgreSQL)
+      responses:
+        "200":
+          description: Listo
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Readiness" }
+        "503":
+          description: Base de datos no disponible
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Readiness" }
+  /api/v1/demo/info:
+    get:
+      operationId: getDemoInfo
+      summary: Información ficticia del entorno (solo desarrollo)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DemoInfo" }
+              example: { $ref: "./examples/demo_info.json" }
+  /api/v1/demo/products:
+    get:
+      operationId: listDemoProducts
+      summary: Productos ficticios leídos de PostgreSQL (solo desarrollo)
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/DemoProductList" }
+              example: { $ref: "./examples/demo_products.json" }
+        "503":
+          description: Base de datos no disponible
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/stores:
+    post:
+      operationId: createStore
+      summary: Crea una tienda y entrega su credencial de administrador (una sola vez)
+      description: Solo habilitado en local/development (STORE_SIGNUP_ENABLED). Límite por IP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/StoreCreate" }
+            example: { $ref: "./examples/store_create_request.json" }
+      responses:
+        "201":
+          description: Tienda creada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StoreCreated" }
+              example: { $ref: "./examples/store_create_response.json" }
+        "403": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Validation" }
+        "429": { $ref: "#/components/responses/Error" }
+  /api/v1/stores/{slug}:
+    get:
+      operationId: getPublicStore
+      summary: Datos públicos de una tienda
+      parameters: [{ $ref: "#/components/parameters/Slug" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StorePublic" }
+              example: { $ref: "./examples/store_public.json" }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/v1/admin/stores/current:
+    get:
+      operationId: getCurrentStore
+      summary: Tienda administrada por la credencial
+      security: [{ storeAdmin: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StoreCurrent" }
+              example: { $ref: "./examples/admin_store_current.json" }
+        "401": { $ref: "#/components/responses/Error" }
+  /api/v1/admin/products:
+    get:
+      operationId: listAdminProducts
+      summary: Productos de mi tienda (incluye no disponibles)
+      security: [{ storeAdmin: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProductList" }
+              example: { $ref: "./examples/products_admin_list.json" }
+        "401": { $ref: "#/components/responses/Error" }
+    post:
+      operationId: createProduct
+      summary: Crea un producto en mi tienda
+      security: [{ storeAdmin: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductCreate" }
+            example: { $ref: "./examples/product_create_request.json" }
+      responses:
+        "201":
+          description: Creado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProduct" }
+              example: { $ref: "./examples/product_admin.json" }
+        "401": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Validation" }
+  /api/v1/admin/products/{id}:
+    patch:
+      operationId: updateProduct
+      summary: Modifica un producto de mi tienda (campos omitidos no cambian)
+      security: [{ storeAdmin: [] }]
+      parameters: [{ $ref: "#/components/parameters/ProductId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ProductPatch" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProduct" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Validation" }
+  /api/v1/admin/products/{id}/image:
+    post:
+      operationId: uploadProductImage
+      summary: Sube la foto del producto (JPEG, PNG o WebP; máx. 5 MB)
+      security: [{ storeAdmin: [] }]
+      parameters: [{ $ref: "#/components/parameters/ProductId" }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required: [image]
+              properties:
+                image: { type: string, format: binary }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AdminProduct" }
+        "400": { $ref: "#/components/responses/Error" }
+        "401": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "413": { $ref: "#/components/responses/Error" }
+        "415": { $ref: "#/components/responses/Error" }
+  /api/v1/public/stores/{slug}/products:
+    get:
+      operationId: listPublicProducts
+      summary: Catálogo público (solo productos disponibles)
+      parameters: [{ $ref: "#/components/parameters/Slug" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublicProductList" }
+              example: { $ref: "./examples/products_public_list.json" }
+        "404": { $ref: "#/components/responses/Error" }
+  /api/v1/public/images/{key}:
+    get:
+      operationId: getProductImage
+      summary: Foto de un producto (clave generada por el servidor)
+      description: Necesario para mostrar las fotos subidas; no es un endpoint de negocio.
+      parameters:
+        - name: key
+          in: path
+          required: true
+          schema: { type: string, pattern: "^[0-9a-f-]{36}\\.(jpg|png|webp)$" }
+      responses:
+        "200":
+          description: Imagen
+          content:
+            image/jpeg: {}
+            image/png: {}
+            image/webp: {}
+        "404": { $ref: "#/components/responses/Error" }
+  /api/v1/public/stores/{slug}/orders/preview:
+    post:
+      operationId: previewOrder
+      summary: Valida un pedido, calcula importes desde PostgreSQL y arma el enlace de WhatsApp
+      description: |
+        No persiste ni confirma el pedido. Los precios enviados por el cliente se rechazan
+        (campos desconocidos → 400). Productos ajenos, inexistentes o no disponibles → 422.
+      parameters: [{ $ref: "#/components/parameters/Slug" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/OrderPreviewRequest" }
+            example: { $ref: "./examples/order_preview_request.json" }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/OrderPreview" }
+              example: { $ref: "./examples/order_preview_response.json" }
+        "400": { $ref: "#/components/responses/Error" }
+        "404": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Error" }
+  /api/v1/admin/ai/product-description:
+    post:
+      operationId: generateProductDescription
+      summary: KiuPop AI propone nombre y descripción (el comerciante revisa antes de guardar)
+      description: |
+        Nunca propone ni modifica precios. 503 ai_disabled si no hay proveedor configurado;
+        429 al superar el límite por tienda/día; 502 si el proveedor falla.
+      security: [{ storeAdmin: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AIRequest" }
+            example: { $ref: "./examples/ai_request.json" }
+      responses:
+        "200":
+          description: Sugerencia
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AISuggestion" }
+              example: { $ref: "./examples/ai_response.json" }
+        "401": { $ref: "#/components/responses/Error" }
+        "422": { $ref: "#/components/responses/Validation" }
+        "429": { $ref: "#/components/responses/Error" }
+        "502": { $ref: "#/components/responses/Error" }
+        "503": { $ref: "#/components/responses/Error" }
+  /api/v1/me:
+    get:
+      operationId: getMe
+      summary: Usuario autenticado y sus tiendas
+      security: [{ kiupopUser: [] }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Me" }
+              example: { $ref: "./examples/me.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /api/v1/me/stores/claim:
+    post:
+      operationId: claimLegacyStore
+      summary: Vincular a la cuenta una tienda del POC (prueba de posesión con su clave kp_; la clave se revoca)
+      security: [{ kiupopUser: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/ClaimRequest" }
+            example: { $ref: "./examples/claim_request.json" }
+      responses:
+        "200":
+          description: Tienda vinculada
+          content:
+            application/json:
+              schema: { type: object, required: [store], properties: { store: { $ref: "#/components/schemas/Store" } } }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+        "409":
+          description: La tienda pertenece a otra cuenta
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/agent/sessions:
+    post:
+      operationId: startAgentSession
+      summary: Iniciar (o reanudar) la conversación con Kiu
+      description: Idempotente. Si el usuario ya tiene una sesión viva, la devuelve (recarga de página).
+      security: [{ kiupopUser: [] }]
+      responses:
+        "200":
+          description: Sesión
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentSession" }
+              example: { $ref: "./examples/agent_session.json" }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /api/v1/agent/sessions/current:
+    get:
+      operationId: getCurrentAgentSession
+      summary: Sesión más reciente del usuario (viva o publicada)
+      security: [{ kiupopUser: [] }]
+      responses:
+        "200":
+          description: Sesión
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentSession" }
+        "404": { $ref: "#/components/responses/SessionNotFound" }
+  /api/v1/agent/sessions/{id}:
+    get:
+      operationId: getAgentSession
+      summary: Estado completo de la sesión (mensajes, progreso, readiness, costo IA y tiempos)
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      responses:
+        "200":
+          description: Sesión
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentSession" }
+        "404": { $ref: "#/components/responses/SessionNotFound" }
+  /api/v1/agent/sessions/{id}/messages:
+    post:
+      operationId: postAgentMessage
+      summary: Enviar un mensaje a Kiu (turno conversacional)
+      description: |
+        Kiu extrae datos, ejecuta herramientas tipadas y validadas, decide la próxima pregunta y encola
+        el trabajo afectado (estilo, descripciones, vista previa) en paralelo. Reintentar con el mismo
+        client_message_id no duplica nada.
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/AgentMessageRequest" }
+            example: { $ref: "./examples/agent_message_request.json" }
+      responses:
+        "200":
+          description: Sesión actualizada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentSession" }
+        "409":
+          description: La sesión ya fue publicada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "422":
+          description: Mensaje vacío o demasiado largo
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/ValidationError" }
+        "429":
+          description: Demasiados mensajes
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/agent/sessions/{id}/attachments:
+    post:
+      operationId: uploadAgentAttachment
+      summary: Compartir un archivo con Kiu (foto, catálogo Excel/CSV/texto o PDF)
+      description: |
+        Un archivo por solicitud (los clientes suben en paralelo). Se valida por contenido, nunca por el tipo
+        declarado: fotos JPEG/PNG/WebP ≤ 5 MB, catálogo .xlsx ≤ 5 MB, CSV o .txt UTF-8 ≤ 1 MB (producto y precio por fila o línea), PDF ≤ 20 MB. Máximo 5 archivos y 50 MB por sesión.
+        Cada archivo tiene su estado (received → processing → processed | needs_review | error) y se procesa en la
+        cola del agente. Los precios de un PDF solo se usan si el comerciante los confirma.
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema: { type: object, required: [file], properties: { file: { type: string, format: binary } } }
+      responses:
+        "201":
+          description: Recibido y encolado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentAttachment" }
+              example: { $ref: "./examples/agent_attachment.json" }
+        "409":
+          description: Límite de archivos alcanzado, o sesión publicada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "413":
+          description: Archivo demasiado grande
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "415":
+          description: Tipo no admitido (por contenido)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/agent/sessions/{id}/events:
+    get:
+      operationId: listAgentEvents
+      summary: Eventos de progreso (polling / long-poll, alternativa a SSE)
+      security: [{ kiupopUser: [] }]
+      parameters:
+        - { $ref: "#/components/parameters/SessionId" }
+        - { name: after, in: query, schema: { type: integer, minimum: 0 }, description: Último id de evento recibido }
+        - { name: wait, in: query, schema: { type: integer, minimum: 0, maximum: 10 }, description: Segundos de espera (long-poll) }
+      responses:
+        "200":
+          description: Eventos con id > after, en orden
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/AgentEvents" }
+              example: { $ref: "./examples/agent_events.json" }
+  /api/v1/agent/sessions/{id}/stream-ticket:
+    post:
+      operationId: createAgentStreamTicket
+      summary: Ticket opaco (10 min) para abrir el stream SSE
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      responses:
+        "200":
+          description: Ticket
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StreamTicket" }
+              example: { $ref: "./examples/agent_stream_ticket.json" }
+  /api/v1/agent/stream:
+    get:
+      operationId: streamAgentEvents
+      summary: Server-Sent Events de la sesión (reanuda con Last-Event-ID)
+      parameters:
+        - { name: ticket, in: query, required: true, schema: { type: string } }
+        - { name: after, in: query, schema: { type: integer, minimum: 0 } }
+      responses:
+        "200":
+          description: "text/event-stream: `id`, `event` (tipo) y `data` (AgentEvent en JSON)"
+          content:
+            text/event-stream:
+              schema: { type: string }
+        "401": { $ref: "#/components/responses/Unauthorized" }
+  /api/v1/agent/sessions/{id}/preview:
+    get:
+      operationId: getAgentPreview
+      summary: Vista previa del borrador, idéntica a la tienda pública
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      responses:
+        "200":
+          description: Vista de tienda (status draft)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StorefrontView" }
+  /api/v1/agent/sessions/{id}/publish:
+    post:
+      operationId: publishAgentStore
+      summary: Publicar el snapshot validado (requiere confirmación explícita; idempotente)
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublishRequest" }
+            example: { $ref: "./examples/agent_publish_request.json" }
+      responses:
+        "200":
+          description: Publicada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PublishResult" }
+              example: { $ref: "./examples/agent_publish_response.json" }
+        "400":
+          description: Falta confirmación
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "402":
+          description: El paywall está activo y la tienda no tiene plan (error.code=plan_required)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "409":
+          description: Faltan datos imprescindibles (error.missing)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/agent/sessions/{id}/plan:
+    post:
+      operationId: activateAgentStorePlan
+      summary: Activar el plan de US$5/mes con un pago de prueba (sin dinero real; idempotente)
+      security: [{ kiupopUser: [] }]
+      parameters: [{ $ref: "#/components/parameters/SessionId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/PublishRequest" }
+            example: { $ref: "./examples/agent_plan_request.json" }
+      responses:
+        "200":
+          description: Plan activo (modo prueba)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PlanView" }
+              example: { $ref: "./examples/agent_plan_response.json" }
+        "400":
+          description: Falta confirmación
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "404":
+          description: La sesión no existe o no es tuya
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+        "503":
+          description: No hay pagos de prueba en este entorno (error.code=payments_unavailable)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/public/stores/{slug}/storefront:
+    get:
+      operationId: getStorefront
+      summary: Tienda publicada lista para renderizar (plantilla + tokens validados)
+      parameters: [{ $ref: "#/components/parameters/Slug" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/StorefrontView" }
+              example: { $ref: "./examples/storefront_view.json" }
+        "404":
+          description: No existe o es un borrador
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/public/stores/{slug}/checkout:
+    post:
+      operationId: createTestCheckout
+      summary: Checkout en modo de prueba (MockPaymentGateway; nunca cobra dinero real)
+      parameters: [{ $ref: "#/components/parameters/Slug" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/CheckoutRequest" }
+            example: { $ref: "./examples/checkout_request.json" }
+      responses:
+        "201":
+          description: Solicitud de pago de prueba creada (montos calculados por el servidor)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+              example: { $ref: "./examples/payment.json" }
+        "409":
+          description: La tienda no tiene checkout (pedidos solo por WhatsApp)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/public/payments/{id}:
+    get:
+      operationId: getPayment
+      summary: Estado de un pago de prueba
+      parameters: [{ $ref: "#/components/parameters/ProductId" }]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+        "404":
+          description: No existe
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /api/v1/public/payments/{id}/test-outcome:
+    post:
+      operationId: simulateTestPayment
+      summary: Simular el resultado del pago de prueba (solo local/development; se liquida una vez)
+      parameters: [{ $ref: "#/components/parameters/ProductId" }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { type: object, required: [outcome], properties: { outcome: { type: string, enum: [approved, declined] } } }
+            example: { $ref: "./examples/payment_test_outcome_request.json" }
+      responses:
+        "200":
+          description: Estado final (test_approved | test_declined)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Payment" }
+        "403":
+          description: Simulación deshabilitada en este entorno
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Error" }
+  /p/{slug}:
+    get:
+      operationId: getSharePage
+      summary: Página para compartir (Open Graph para WhatsApp/Facebook); redirige al catálogo
+      parameters: [{ $ref: "#/components/parameters/Slug" }]
+      responses:
+        "200":
+          description: HTML con og:title, og:description, og:image
+          content:
+            text/html:
+              schema: { type: string }
+  /og/{file}:
+    get:
+      operationId: getShareImage
+      summary: Portada 1200x630 generada con la paleta de la tienda
+      parameters: [{ name: file, in: path, required: true, schema: { type: string, pattern: "^[a-z0-9-]+\\.png$" } }]
+      responses:
+        "200":
+          description: PNG
+          content:
+            image/png:
+              schema: { type: string, format: binary }
+  /api/v1/speech/status:
+    get:
+      operationId: getSpeechStatus
+      summary: ¿Hay transcripción de voz disponible? (proveedor y límites)
+      security: [{ kiupopUser: [] }]
+      responses:
+        "200":
+          description: Estado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SpeechStatus" }
+              example: { $ref: "./examples/speech_status.json" }
+  /api/v1/speech/transcriptions:
+    post:
+      operationId: createSpeechTranscription
+      summary: Transcribir una nota de voz para que el comerciante la revise antes de enviarla a Kiu
+      description: |
+        Cuerpo = el audio crudo (WAV PCM 16 bits mono, WebM/Opus u Ogg/Opus), validado por contenido. Máximo
+        AUDIO_MAX_SECONDS (60 s) y AUDIO_MAX_BYTES. El audio se envía al proveedor y se descarta: no se guarda ni se
+        registra. La respuesta es solo para mostrarla y corregirla; Kiu recibe el texto que el comerciante confirma.
+        Cuotas diarias por usuario y globales (429 speech_quota).
+      security: [{ kiupopUser: [] }]
+      parameters:
+        - { name: session_id, in: query, required: false, schema: { type: string, format: uuid } }
+      requestBody:
+        required: true
+        content:
+          audio/wav: { schema: { type: string, format: binary } }
+          audio/webm: { schema: { type: string, format: binary } }
+          audio/ogg: { schema: { type: string, format: binary } }
+      responses:
+        "200":
+          description: Transcripción para revisar
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/SpeechTranscription" }
+              example: { $ref: "./examples/speech_transcription.json" }
+        "413": { description: Audio muy largo o pesado, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "415": { description: Formato no admitido (por contenido), content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "422": { description: Audio corto, en silencio o sin palabras, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "429": { description: Límite por hora o cuota diaria de audio, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "502": { description: Falló el proveedor, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "503": { description: Transcripción no configurada, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+  /api/v1/funnel/events:
+    post:
+      operationId: recordFunnelEvent
+      summary: Registrar un hito del funnel que solo la app observa (seudónimo, solo números)
+      security: [{ kiupopUser: [] }]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FunnelEvent" }
+            example: { $ref: "./examples/funnel_event_request.json" }
+      responses:
+        "204": { description: Registrado }
+        "400": { description: Evento o campos no permitidos, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+        "429": { description: Demasiados eventos, content: { application/json: { schema: { $ref: "#/components/schemas/Error" } } } }
+components:
+  responses:
+    Unauthorized:
+      description: Falta o venció el ID token
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    SessionNotFound:
+      description: La sesión no existe o no es del usuario
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+  securitySchemes:
+    kiupopUser:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: ID token de Firebase Auth del proyecto de KiuPop (o del emulador local). El servidor lo verifica y resuelve el usuario.
+    storeAdmin:
+      type: http
+      scheme: bearer
+      description: Credencial `kp_...` de 256 bits; el servidor guarda solo su SHA-256.
+  parameters:
+    SessionId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+    Slug:
+      name: slug
+      in: path
+      required: true
+      schema: { type: string, pattern: "^[a-z0-9]+(-[a-z0-9]+)*$" }
+    ProductId:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+  responses:
+    Error:
+      description: Error
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/Error" }
+    Validation:
+      description: Datos inválidos
+      content:
+        application/json:
+          schema: { $ref: "#/components/schemas/ValidationError" }
+  schemas:
+    SpeechStatus:
+      type: object
+      required: [enabled, provider, max_seconds, max_bytes]
+      properties:
+        enabled: { type: boolean }
+        provider: { type: string, description: "google-stt-v1 | disabled" }
+        max_seconds: { type: integer }
+        max_bytes: { type: integer }
+    SpeechTranscription:
+      type: object
+      required: [text, provider, language, confidence, duration_ms, latency_ms, billed_seconds]
+      properties:
+        text: { type: string, description: Solo para revisar y corregir; no se guarda }
+        provider: { type: string }
+        language: { type: string }
+        confidence: { type: number }
+        duration_ms: { type: integer }
+        latency_ms: { type: integer }
+        billed_seconds: { type: integer }
+    FunnelEvent:
+      type: object
+      additionalProperties: false
+      required: [event]
+      properties:
+        event:
+          type: string
+          enum: [intake_method_selected, audio_recorded, store_preview_opened, paywall_viewed, catalog_shared, error]
+        session_id: { type: string, format: uuid }
+        meta:
+          type: object
+          description: Solo números enteros no negativos (duraciones, conteos). Nunca texto.
+          additionalProperties: { type: integer, minimum: 0 }
+    StoreCreate:
+      type: object
+      additionalProperties: false
+      required: [name, whatsapp]
+      properties:
+        name: { type: string, minLength: 2, maxLength: 80 }
+        whatsapp: { type: string, description: "8 dígitos de Costa Rica o número internacional con +" }
+        description: { type: string, maxLength: 500 }
+    Store:
+      type: object
+      required: [id, slug, name, description, whatsapp]
+      properties:
+        id: { type: string, format: uuid }
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+        whatsapp: { type: string, description: "E.164 sin +" }
+    StorePublic:
+      type: object
+      required: [slug, name, description]
+      properties:
+        slug: { type: string }
+        name: { type: string }
+        description: { type: string }
+    Features:
+      type: object
+      required: [ai]
+      properties:
+        ai: { type: boolean }
+    StoreCreated:
+      type: object
+      required: [store, admin_token, public_path, features]
+      properties:
+        store: { $ref: "#/components/schemas/Store" }
+        admin_token: { type: string, description: "Se muestra una sola vez. No se puede recuperar." }
+        public_path: { type: string, example: "/s/flores-de-occidente" }
+        features: { $ref: "#/components/schemas/Features" }
+    StoreCurrent:
+      type: object
+      required: [store, features]
+      properties:
+        store: { $ref: "#/components/schemas/Store" }
+        features: { $ref: "#/components/schemas/Features" }
+    ProductCreate:
+      type: object
+      additionalProperties: false
+      required: [name, price_minor]
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        description: { type: string, maxLength: 600 }
+        price_minor: { type: integer, format: int64, minimum: 1, description: "Céntimos de colón" }
+        available: { type: boolean, default: true }
+    ProductPatch:
+      type: object
+      additionalProperties: false
+      minProperties: 1
+      properties:
+        name: { type: string, minLength: 1, maxLength: 80 }
+        description: { type: string, maxLength: 600 }
+        price_minor: { type: integer, format: int64, minimum: 1 }
+        available: { type: boolean }
+    AdminProduct:
+      type: object
+      required: [id, name, description, price_minor, currency, image_url, available, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        price_minor: { type: integer, format: int64 }
+        currency: { type: string, enum: [CRC] }
+        image_url: { type: [string, "null"], description: "Ruta relativa a la API" }
+        available: { type: boolean }
+        created_at: { type: string, format: date-time }
+    AdminProductList:
+      type: object
+      required: [data]
+      properties:
+        data: { type: array, items: { $ref: "#/components/schemas/AdminProduct" } }
+    PublicProduct:
+      type: object
+      required: [id, name, description, price_minor, currency, image_url]
+      properties:
+        id: { type: string, format: uuid }
+        name: { type: string }
+        description: { type: string }
+        price_minor: { type: integer, format: int64 }
+        currency: { type: string, enum: [CRC] }
+        image_url: { type: [string, "null"] }
+    PublicProductList:
+      type: object
+      required: [data]
+      properties:
+        data: { type: array, items: { $ref: "#/components/schemas/PublicProduct" } }
+    OrderPreviewRequest:
+      type: object
+      additionalProperties: false
+      required: [items]
+      properties:
+        items:
+          type: array
+          minItems: 1
+          maxItems: 50
+          items:
+            type: object
+            additionalProperties: false
+            required: [product_id, quantity]
+            properties:
+              product_id: { type: string, format: uuid }
+              quantity: { type: integer, minimum: 1, maximum: 99 }
+    OrderPreview:
+      type: object
+      required: [store, lines, total_minor, currency, message, whatsapp_url]
+      properties:
+        store:
+          type: object
+          required: [slug, name]
+          properties:
+            slug: { type: string }
+            name: { type: string }
+        lines:
+          type: array
+          items:
+            type: object
+            required: [product_id, name, quantity, unit_price_minor, subtotal_minor]
+            properties:
+              product_id: { type: string, format: uuid }
+              name: { type: string }
+              quantity: { type: integer }
+              unit_price_minor: { type: integer, format: int64 }
+              subtotal_minor: { type: integer, format: int64 }
+        total_minor: { type: integer, format: int64 }
+        currency: { type: string, enum: [CRC] }
+        message: { type: string }
+        whatsapp_url: { type: string, format: uri }
+    AIRequest:
+      type: object
+      additionalProperties: false
+      required: [text]
+      properties:
+        text: { type: string, minLength: 3, maxLength: 500 }
+    AISuggestion:
+      type: object
+      required: [name, short_description, marketing_text, generated_by]
+      properties:
+        name: { type: string }
+        short_description: { type: string }
+        marketing_text: { type: string }
+        generated_by: { type: string, enum: ["KiuPop AI"] }
+    ValidationError:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message, fields]
+          properties:
+            code: { type: string, enum: [validation_failed] }
+            message: { type: string }
+            fields: { type: object, additionalProperties: { type: string } }
+    Health:
+      type: object
+      required: [status, service]
+      properties:
+        status: { type: string, enum: [ok] }
+        service: { type: string }
+    Readiness:
+      type: object
+      required: [status, checks]
+      properties:
+        status: { type: string, enum: [ready, unavailable] }
+        checks:
+          type: object
+          additionalProperties: { type: string, enum: [up, down] }
+    DemoInfo:
+      type: object
+      required: [service, version, environment, mock_mode, kiuvy_integration, message]
+      properties:
+        service: { type: string }
+        version: { type: string }
+        environment: { type: string, enum: [local, development] }
+        mock_mode: { type: boolean }
+        kiuvy_integration: { type: string, enum: [disabled] }
+        message: { type: string }
+    DemoProduct:
+      type: object
+      required: [id, name, description, price_minor, currency]
+      properties:
+        id: { type: string }
+        name: { type: string }
+        description: { type: string }
+        price_minor:
+          type: integer
+          format: int64
+          minimum: 0
+          description: Monto en unidades menores (céntimos). Nunca float.
+        currency: { type: string, minLength: 3, maxLength: 3 }
+    DemoProductList:
+      type: object
+      required: [data, source]
+      properties:
+        data:
+          type: array
+          items: { $ref: "#/components/schemas/DemoProduct" }
+        source: { type: string, enum: [postgres] }
+    Me:
+      type: object
+      required: [user, stores, auth_mode, features]
+      properties:
+        user:
+          type: object
+          required: [email, name, provider]
+          properties:
+            email: { type: string }
+            name: { type: string }
+            provider: { type: string, description: "password | google.com | facebook.com" }
+        stores:
+          type: array
+          items:
+            type: object
+            required: [slug, name, status]
+            properties:
+              slug: { type: string }
+              name: { type: string }
+              status: { type: string, enum: [draft, published] }
+        auth_mode: { type: string, enum: [emulator, firebase, disabled] }
+        features: { $ref: "#/components/schemas/Features" }
+    ClaimRequest:
+      type: object
+      required: [admin_token]
+      additionalProperties: false
+      properties:
+        admin_token: { type: string, pattern: "^kp_" }
+    QuickReply:
+      type: object
+      required: [label, value]
+      properties:
+        label: { type: string }
+        value: { type: string, description: "Texto a enviar; \"__publish__\" pide confirmación de publicación en el cliente" }
+    AgentQuestion:
+      type: object
+      required: [field, text, reason, essential, quick_replies, allow_upload]
+      properties:
+        field: { type: string, enum: [name, products, prices, whatsapp, delivery, style, channels, pain], description: "channels y pain son preguntas del diagnóstico (KIU_DISCOVERY_ENABLED)" }
+        text: { type: string }
+        reason: { type: string, description: Por qué Kiu lo pregunta }
+        essential: { type: boolean, description: Bloquea la publicación si falta }
+        quick_replies: { type: [array, "null"], items: { $ref: "#/components/schemas/QuickReply" } }
+        allow_upload: { type: boolean, description: "Ofrece subir el catálogo (Excel, CSV o texto). Solo en el flujo de tienda online; en otros canales Kiu da una guía" }
+    AgentMessage:
+      type: object
+      required: [id, role, text, meta, created_at]
+      properties:
+        id: { type: integer }
+        role: { type: string, enum: [user, kiu] }
+        text: { type: string }
+        meta:
+          type: object
+          properties:
+            kind: { type: string, enum: [greeting, ack, question, building, ready, published, notice, plan, kit], description: "plan = recomendación del diagnóstico; kit = textos listos para cada canal al publicar" }
+            question: { $ref: "#/components/schemas/AgentQuestion" }
+            quick_replies: { type: array, items: { $ref: "#/components/schemas/QuickReply" } }
+            brain_mode: { type: string, enum: [claude, local] }
+        created_at: { type: string, format: date-time }
+    AgentTask:
+      type: object
+      required: [key, label, status]
+      properties:
+        key: { type: string, enum: [profile, draft, catalog, copy, theme, contact, delivery, preview] }
+        label: { type: string }
+        status: { type: string, enum: [pending, running, done, needs_input, skipped, failed] }
+    AgentProgress:
+      type: object
+      required: [percent, tasks, ready]
+      properties:
+        percent: { type: integer, minimum: 0, maximum: 100, description: "100 solo cuando el backend validó readiness" }
+        tasks: { type: array, items: { $ref: "#/components/schemas/AgentTask" } }
+        ready: { type: boolean }
+    Missing:
+      type: object
+      required: [field, message]
+      properties:
+        field: { type: string }
+        message: { type: string }
+    AgentSession:
+      type: object
+      required: [id, status, revision, store, messages, pending_question, progress, readiness, summary, ai, last_event_id, timing, publication]
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [collecting, building, ready, published] }
+        revision: { type: integer, description: Versión del StoreBlueprint }
+        store: { type: [object, "null"], properties: { slug: { type: string } } }
+        messages: { type: array, items: { $ref: "#/components/schemas/AgentMessage" } }
+        pending_question: { oneOf: [{ $ref: "#/components/schemas/AgentQuestion" }, { type: "null" }] }
+        progress: { $ref: "#/components/schemas/AgentProgress" }
+        readiness:
+          type: object
+          required: [ready, missing]
+          properties:
+            ready: { type: boolean }
+            missing: { type: array, items: { $ref: "#/components/schemas/Missing" } }
+        summary:
+          type: object
+          description: Resumen público de lo que Kiu entendió (sin teléfono)
+          properties:
+            business_name: { type: string }
+            category: { type: string }
+            template: { type: string }
+            template_reason: { type: string }
+            products: { type: integer }
+            priced_products: { type: integer }
+            delivery_modes: { type: array, items: { type: string } }
+            zones: { type: array, items: { type: string } }
+            has_whatsapp: { type: boolean }
+            questions_asked: { type: integer }
+            checkout_mode: { type: string, enum: [none, test] }
+            real_payments_enabled: { type: boolean, const: false }
+        ai:
+          type: object
+          required: [mode, calls, cost_micros]
+          properties:
+            mode: { type: string, enum: [claude, local] }
+            calls: { type: integer }
+            cost_micros: { type: integer, description: Costo IA acumulado en micro-USD }
+        last_event_id: { type: integer }
+        timing:
+          type: object
+          properties:
+            started_at: { type: string, format: date-time }
+            to_ready_ms: { type: [integer, "null"] }
+            to_published_ms: { type: [integer, "null"] }
+            first_message_to_ready_ms: { type: [integer, "null"] }
+        publication: { oneOf: [{ $ref: "#/components/schemas/PublishResult" }, { type: "null" }] }
+        attachments: { type: array, items: { $ref: "#/components/schemas/AgentAttachment" } }
+        limits:
+          type: object
+          properties:
+            max_attachments: { type: integer }
+            max_attachments_bytes: { type: integer }
+            attachments_enabled: { type: boolean }
+        paywall: { $ref: "#/components/schemas/PlanView" }
+    PlanView:
+      type: object
+      description: >
+        Paywall del quiz funnel. Ver la tienda es gratis; publicarla requiere el plan
+        de US$5/mes por tienda activa. En esta fase solo existe en modo prueba (mode=test):
+        no se cobra dinero real. required=false cuando PAYWALL_ENABLED=false.
+      required: [required, active, price_minor, currency, interval, mode, plan, notice]
+      properties:
+        required: { type: boolean }
+        active: { type: boolean }
+        price_minor: { type: integer, const: 500 }
+        currency: { type: string, const: USD }
+        interval: { type: string, const: month }
+        mode: { type: string, const: test }
+        notice: { type: string }
+        plan:
+          oneOf:
+            - type: "null"
+            - type: object
+              required: [plan, status, price_minor, currency, test, current_period_end]
+              properties:
+                plan: { type: string, const: kiupop_monthly }
+                status: { type: string, enum: [active, canceled] }
+                price_minor: { type: integer, const: 500 }
+                currency: { type: string, const: USD }
+                test: { type: boolean, const: true }
+                current_period_end: { type: string, format: date-time }
+    AgentAttachment:
+      type: object
+      required: [id, kind, filename, size_bytes, status, note, image_url, created_at]
+      properties:
+        id: { type: string, format: uuid }
+        kind: { type: string, enum: [image, csv, pdf], description: "csv incluye catálogos Excel, CSV y texto plano" }
+        filename: { type: string, description: Nombre saneado (solo para mostrar) }
+        size_bytes: { type: integer }
+        status: { type: string, enum: [received, processing, processed, needs_review, error] }
+        note: { type: string, description: Qué hizo Kiu con el archivo }
+        image_url: { type: [string, "null"] }
+        created_at: { type: string, format: date-time }
+    AgentMessageRequest:
+      type: object
+      required: [text]
+      additionalProperties: false
+      properties:
+        text: { type: string, minLength: 1, maxLength: 1000 }
+        client_message_id: { type: string, minLength: 8, maxLength: 64, description: Idempotencia del turno }
+    AgentEvent:
+      type: object
+      required: [id, type, payload, created_at]
+      properties:
+        id: { type: integer }
+        type: { type: string, enum: [message.created, progress, preview.updated, store.ready, store.published, attachment.updated] }
+        payload: { type: object }
+        created_at: { type: string, format: date-time }
+    AgentEvents:
+      type: object
+      required: [events]
+      properties:
+        events: { type: array, items: { $ref: "#/components/schemas/AgentEvent" } }
+    StreamTicket:
+      type: object
+      required: [ticket, expires_in]
+      properties:
+        ticket: { type: string }
+        expires_in: { type: integer }
+    PublishRequest:
+      type: object
+      required: [confirm]
+      additionalProperties: false
+      properties:
+        confirm: { type: boolean, const: true }
+    PublishResult:
+      type: object
+      required: [slug, version, public_path, share_url]
+      properties:
+        slug: { type: string }
+        version: { type: integer }
+        public_path: { type: string }
+        share_url: { type: string, format: uri, description: "Página con Open Graph (/p/{slug})" }
+    ThemeTokens:
+      type: object
+      required: [template, colors, typography, radius, spacing, card_style, button_style, hero, sections]
+      properties:
+        template: { type: string, enum: [bubblegum_pink, mint_fresh, peach_pop] }
+        colors:
+          type: object
+          description: Hex validados por contraste WCAG (texto 4.5:1, UI 3:1)
+          properties:
+            primary: { type: string }
+            on_primary: { type: string }
+            secondary: { type: string }
+            background: { type: string }
+            surface: { type: string }
+            text: { type: string }
+            muted: { type: string }
+            accent: { type: string }
+        typography:
+          type: object
+          properties:
+            style: { type: string, enum: [elegant, modern, playful] }
+            heading_weight: { type: integer, minimum: 600, maximum: 900 }
+            scale: { type: number, minimum: 0.9, maximum: 1.15 }
+        radius: { type: integer, minimum: 8, maximum: 28 }
+        spacing: { type: string, enum: [compact, comfortable] }
+        card_style: { type: string, enum: [soft, outlined, elevated] }
+        button_style: { type: string, enum: [pill, rounded] }
+        hero: { type: object, properties: { style: { type: string, enum: [gradient, image] } } }
+        sections: { type: array, items: { type: string, enum: [hero, featured, catalog, delivery, contact] } }
+    StorefrontView:
+      type: object
+      required: [store, theme, products, delivery, contact, payments, share]
+      properties:
+        store:
+          type: object
+          properties:
+            slug: { type: string }
+            name: { type: string }
+            tagline: { type: string }
+            description: { type: string }
+            category: { type: string }
+            status: { type: string, enum: [draft, published] }
+            cover_url: { type: [string, "null"], description: Foto de portada compartida por el comerciante }
+        theme: { $ref: "#/components/schemas/ThemeTokens" }
+        products:
+          type: array
+          items:
+            type: object
+            required: [id, name, description, price_minor, currency, image_url, featured]
+            properties:
+              id: { type: string, format: uuid }
+              name: { type: string }
+              description: { type: string }
+              price_minor: { type: integer, minimum: 1 }
+              currency: { type: string, enum: [CRC] }
+              image_url: { type: [string, "null"] }
+              featured: { type: boolean }
+        delivery:
+          type: object
+          properties:
+            modes: { type: array, items: { type: string, enum: [delivery, pickup] }, description: "Vacío = se coordina por WhatsApp" }
+            zones: { type: array, items: { type: string } }
+            notes: { type: string }
+        contact:
+          type: object
+          properties:
+            whatsapp_url: { type: string }
+            instagram: { type: string }
+            facebook: { type: string }
+        payments:
+          type: object
+          properties:
+            checkout: { type: string, enum: [none, test] }
+            real_payments_enabled: { type: boolean, const: false }
+            methods_to_coordinate: { type: array, items: { type: string } }
+        share:
+          type: object
+          properties:
+            url: { type: string }
+            title: { type: string }
+            text: { type: string }
+    CheckoutRequest:
+      type: object
+      required: [items, idempotency_key]
+      additionalProperties: false
+      properties:
+        items:
+          type: array
+          items:
+            type: object
+            additionalProperties: false
+            required: [product_id, quantity]
+            properties:
+              product_id: { type: string, format: uuid }
+              quantity: { type: integer, minimum: 1, maximum: 99 }
+        idempotency_key: { type: string, minLength: 8, maxLength: 64 }
+    Payment:
+      type: object
+      required: [id, status, mode, gateway, amount_minor, currency, lines, notice]
+      properties:
+        id: { type: string, format: uuid }
+        status: { type: string, enum: [pending, test_approved, test_declined, expired] }
+        mode: { type: string, enum: [test] }
+        gateway: { type: string, enum: [mock] }
+        amount_minor: { type: integer }
+        currency: { type: string, enum: [CRC] }
+        lines:
+          type: array
+          items:
+            type: object
+            properties:
+              product_id: { type: string }
+              name: { type: string }
+              quantity: { type: integer }
+              unit_price_minor: { type: integer }
+              subtotal_minor: { type: integer }
+        notice: { type: string }
+    Error:
+      type: object
+      required: [error]
+      properties:
+        error:
+          type: object
+          required: [code, message]
+          properties:
+            code: { type: string }
+            message: { type: string }

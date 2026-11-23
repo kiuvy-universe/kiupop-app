@@ -1,0 +1,107 @@
+# KiuPop CI. Untrusted-code safe: runs on `pull_request` (never `pull_request_target`),
+# read-only token, no secrets required, no deployments.
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  GO_VERSION: "1.26"
+  FLUTTER_VERSION: "3.47.9"
+
+jobs:
+  go:
+    name: Go (fmt, vet, test, build)
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults: { run: { working-directory: backend } }
+    services:
+      postgres:
+        image: postgres:18.6-alpine3.24
+        env:
+          POSTGRES_DB: kiupop_test
+          POSTGRES_USER: kiupop
+          POSTGRES_PASSWORD: ci_only_not_secret
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U kiupop -d kiupop_test"
+          --health-interval 5s --health-timeout 3s --health-retries 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: actions/setup-go@d8cbb8045d7f43706b9177cceb36c1f91a6644d5 # v7.1.0
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache-dependency-path: backend/go.sum
+      - run: go mod download && go mod verify
+      - name: gofmt
+        run: test -z "$(gofmt -l .)" || { gofmt -l .; exit 1; }
+      - run: go vet ./...
+      - run: go test -race ./...
+      - name: Integration tests (PostgreSQL)
+        env:
+          KIUPOP_TEST_DATABASE_URL: postgres://kiupop:ci_only_not_secret@localhost:5432/kiupop_test?sslmode=disable
+        run: go test -race -count=1 -run Postgres ./...
+      - run: CGO_ENABLED=0 go build -trimpath -o /dev/null ./cmd/server
+
+  flutter:
+    name: Flutter (analyze, test, build web)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults: { run: { working-directory: apps/web } }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - uses: subosito/flutter-action@1a449444c387b1966244ae4d4f8c696479add0b2 # v2.23.0
+        with:
+          channel: stable
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+      - run: flutter pub get
+      - run: dart format --output=none --set-exit-if-changed lib test
+      - run: flutter analyze --no-pub
+      - run: flutter test --no-pub
+      - run: flutter build web --release --dart-define=API_BASE_URL=http://localhost:8080
+
+  infra:
+    name: Infra (compose, image, smoke e2e)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { persist-credentials: false }
+      - name: Validate compose
+        run: docker compose --env-file .env.example -f infra/compose.yaml config -q
+      - name: Build API image and start stack
+        run: docker compose --env-file .env.example -f infra/compose.yaml up -d --build --wait
+      - name: Smoke (API ↔ PostgreSQL, CORS, loopback-only ports)
+        run: scripts/smoke.sh
+      - name: Logs on failure
+        if: failure()
+        run: docker compose --env-file .env.example -f infra/compose.yaml logs --no-color
+      - name: Tear down
+        if: always()
+        run: docker compose --env-file .env.example -f infra/compose.yaml down -v
+
+  secrets:
+    name: Secret scan (gitleaks)
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with: { fetch-depth: 0, persist-credentials: false }
+      - name: gitleaks (full history)
+        run: >
+          docker run --rm -v "$PWD:/repo" -w /repo ghcr.io/gitleaks/gitleaks:v8.30.1
+          git --no-banner --redact --exit-code 1 /repo

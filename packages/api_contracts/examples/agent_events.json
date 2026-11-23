@@ -1,0 +1,79 @@
+{
+  "events": [
+    {
+      "id": 36,
+      "type": "message.created",
+      "payload": {
+        "id": 17,
+        "meta": {
+          "kind": "greeting",
+          "brain_mode": "local"
+        },
+        "role": "kiu",
+        "text": "¡Hola! Soy Kiu. Contame qué hace tu negocio y yo me encargo de crear tu tienda. Escribime con tus palabras: qué vendés, cómo se llama y cómo te gustaría que se vea.",
+        "created_at": "2026-11-22T14:50:06.042986Z"
+      },
+      "created_at": "2026-11-22T14:50:06.042986Z"
+    },
+    {
+      "id": 40,
+      "type": "progress",
+      "payload": {
+        "ready": false,
+        "tasks": [
+          {
+            "key": "profile",
+            "label": "Entender tu negocio",
+            "status": "done"
+          },
+          {
+            "key": "draft",
+            "label": "Crear el borrador",
+            "status": "done"
+          },
+          {
+            "key": "catalog",
+            "label": "Armar el catálogo",
+            "status": "done"
+          },
+          {
+            "key": "copy",
+            "label": "Descripciones (requiere IA)",
+            "status": "skipped"
+          },
+          {
+            "key": "theme",
+            "label": "Diseñar el estilo",
+            "status": "running"
+          },
+          {
+            "key": "contact",
+            "label": "Conectar WhatsApp",
+            "status": "done"
+          },
+          {
+            "key": "delivery",
+            "label": "Opciones de entrega",
+            "status": "done"
+          },
+          {
+            "key": "preview",
+            "label": "Vista previa lista",
+            "status": "running"
+          }
+        ],
+        "percent": 84
+      },
+      "created_at": "2026-11-22T14:50:06.060167Z"
+    },
+    {
+      "id": 44,
+      "type": "store.ready",
+      "payload": {
+        "slug": "vivero-luna",
+        "revision": 3
+      },
+      "created_at": "2026-11-22T14:50:06.068637Z"
+    }
+  ]
+}

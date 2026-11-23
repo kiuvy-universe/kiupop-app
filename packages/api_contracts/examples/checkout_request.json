@@ -1,0 +1,9 @@
+{
+  "items": [
+    {
+      "product_id": "840501e1-364b-4fe2-9cca-dffdb43056b5",
+      "quantity": 2
+    }
+  ],
+  "idempotency_key": "chk-0000000001"
+}

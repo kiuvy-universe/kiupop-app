@@ -1,0 +1,258 @@
+{
+  "id": "6c6b606f-1606-445e-b01a-801d2533ef3a",
+  "status": "ready",
+  "revision": 7,
+  "store": {
+    "slug": "floreria-bella-30"
+  },
+  "messages": [
+    {
+      "id": 409,
+      "role": "kiu",
+      "text": "¡Hola! Soy Kiu. Contame qué hace tu negocio y yo me encargo de crear tu tienda. Escribime con tus palabras: qué vendés, cómo se llama y cómo te gustaría que se vea.",
+      "meta": {
+        "kind": "greeting",
+        "brain_mode": "local"
+      },
+      "created_at": "2026-11-22T15:36:16.48573Z"
+    },
+    {
+      "id": 410,
+      "role": "user",
+      "text": "Soy Florería Bella, vendo flores, arreglos y regalos. Quiero algo elegante y romántico, con colores rosados. Entrego en Naranjo y San Ramón.",
+      "meta": {},
+      "created_at": "2026-11-22T15:36:16.505111Z"
+    },
+    {
+      "id": 411,
+      "role": "kiu",
+      "text": "¡Qué lindo, Florería Bella! Ya empecé a armar tu tienda. Anoté 3 productos.",
+      "meta": {
+        "kind": "ack",
+        "brain_mode": "local"
+      },
+      "created_at": "2026-11-22T15:36:16.505111Z"
+    },
+    {
+      "id": 412,
+      "role": "kiu",
+      "text": "Para tu catálogo necesito precios reales. ¿Cuánto vale flores, arreglos y regalos?",
+      "meta": {
+        "question": {
+          "field": "prices",
+          "text": "Me faltan los precios de flores, arreglos y regalos. ¿Cuánto cuesta cada uno?",
+          "reason": "Nunca invento precios: solo publico los que me das.",
+          "essential": true,
+          "quick_replies": null,
+          "allow_upload": true
+        },
+        "kind": "question",
+        "brain_mode": "local"
+      },
+      "created_at": "2026-11-22T15:36:16.505111Z"
+    },
+    {
+      "id": 413,
+      "role": "kiu",
+      "text": "📷 Foto de «Flores».",
+      "meta": {
+        "kind": "notice"
+      },
+      "created_at": "2026-11-22T15:36:17.150473Z"
+    },
+    {
+      "id": 414,
+      "role": "user",
+      "text": "Ramo de rosas 15000, arreglo de girasoles 18 mil y caja de regalo con chocolates ₡12.500",
+      "meta": {},
+      "created_at": "2026-11-22T15:36:17.158459Z"
+    },
+    {
+      "id": 415,
+      "role": "kiu",
+      "text": "Listo, 3 productos con precio.",
+      "meta": {
+        "kind": "ack",
+        "brain_mode": "local"
+      },
+      "created_at": "2026-11-22T15:36:17.158459Z"
+    },
+    {
+      "id": 416,
+      "role": "kiu",
+      "text": "¿A qué número de WhatsApp querés que te lleguen los pedidos?",
+      "meta": {
+        "question": {
+          "field": "whatsapp",
+          "text": "¿A qué número de WhatsApp te llegan los pedidos?",
+          "reason": "Cada pedido de tu tienda llega a ese WhatsApp.",
+          "essential": true,
+          "quick_replies": null,
+          "allow_upload": false
+        },
+        "kind": "question",
+        "brain_mode": "local"
+      },
+      "created_at": "2026-11-22T15:36:17.158459Z"
+    },
+    {
+      "id": 417,
+      "role": "user",
+      "text": "Mi WhatsApp es 8888-1234",
+      "meta": {},
+      "created_at": "2026-11-22T15:36:17.781963Z"
+    },
+    {
+      "id": 418,
+      "role": "kiu",
+      "text": "Perfecto, los pedidos van a llegar a ese WhatsApp.",
+      "meta": {
+        "kind": "ack",
+        "brain_mode": "local"
+      },
+      "created_at": "2026-11-22T15:36:17.781963Z"
+    },
+    {
+      "id": 419,
+      "role": "kiu",
+      "text": "¡Ya tengo todo lo que necesito! Estoy terminando tu tienda…",
+      "meta": {
+        "kind": "building"
+      },
+      "created_at": "2026-11-22T15:36:17.781963Z"
+    },
+    {
+      "id": 420,
+      "role": "kiu",
+      "text": "¡POP! Tu tienda está lista. Elegí Bubblegum Pink porque mencionaste el color rosado. Dejé 2 productos sin precio fuera del catálogo hasta que me digás cuánto cuestan. Revisala y publicala cuando quieras.",
+      "meta": {
+        "quick_replies": [
+          {
+            "label": "Publicar mi tienda",
+            "value": "__publish__"
+          },
+          {
+            "label": "Probar Mint Fresh",
+            "value": "Probar Mint Fresh"
+          },
+          {
+            "label": "Probar Peach Pop",
+            "value": "Probar Peach Pop"
+          }
+        ],
+        "kind": "ready"
+      },
+      "created_at": "2026-11-22T15:36:17.78819Z"
+    }
+  ],
+  "pending_question": null,
+  "progress": {
+    "percent": 100,
+    "tasks": [
+      {
+        "key": "profile",
+        "label": "Entender tu negocio",
+        "status": "done"
+      },
+      {
+        "key": "draft",
+        "label": "Crear el borrador",
+        "status": "done"
+      },
+      {
+        "key": "catalog",
+        "label": "Armar el catálogo",
+        "status": "done"
+      },
+      {
+        "key": "copy",
+        "label": "Descripciones (requiere IA)",
+        "status": "skipped"
+      },
+      {
+        "key": "theme",
+        "label": "Diseñar el estilo",
+        "status": "done"
+      },
+      {
+        "key": "contact",
+        "label": "Conectar WhatsApp",
+        "status": "done"
+      },
+      {
+        "key": "delivery",
+        "label": "Opciones de entrega",
+        "status": "done"
+      },
+      {
+        "key": "preview",
+        "label": "Vista previa lista",
+        "status": "done"
+      }
+    ],
+    "ready": true
+  },
+  "readiness": {
+    "ready": true,
+    "missing": []
+  },
+  "summary": {
+    "business_name": "Florería Bella",
+    "category": "flores",
+    "template": "bubblegum_pink",
+    "template_reason": "Elegí Bubblegum Pink porque mencionaste el color rosado.",
+    "products": 5,
+    "priced_products": 3,
+    "delivery_modes": [
+      "delivery"
+    ],
+    "zones": [
+      "Naranjo",
+      "San Ramón"
+    ],
+    "has_whatsapp": true,
+    "questions_asked": 2,
+    "checkout_mode": "test",
+    "real_payments_enabled": false
+  },
+  "ai": {
+    "mode": "local",
+    "calls": 0,
+    "cost_micros": 0
+  },
+  "last_event_id": 886,
+  "timing": {
+    "started_at": "2026-11-22T15:36:16.484297Z",
+    "to_ready_ms": 1306,
+    "to_published_ms": null,
+    "first_message_to_ready_ms": 1285
+  },
+  "publication": null,
+  "attachments": [
+    {
+      "id": "124966ed-658f-4f0f-bae8-f7b5f52223ce",
+      "kind": "image",
+      "filename": "ramo.png",
+      "size_bytes": 179,
+      "status": "processed",
+      "note": "Foto de «Flores».",
+      "image_url": "/api/v1/public/images/bcbc2610-dc39-45ce-bff0-9f388cff05a5.png",
+      "created_at": "2026-11-22T15:36:17.144691Z"
+    }
+  ],
+  "limits": {
+    "max_attachments": 5,
+    "max_attachments_bytes": 52428800,
+    "attachments_enabled": true
+  },
+  "paywall": {
+    "required": true,
+    "active": false,
+    "price_minor": 500,
+    "currency": "USD",
+    "interval": "month",
+    "mode": "test",
+    "plan": null,
+    "notice": "Modo prueba: no se cobra dinero real."
+  }
+}

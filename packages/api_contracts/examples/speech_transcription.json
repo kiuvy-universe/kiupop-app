@@ -1,0 +1,9 @@
+{
+  "text": "Vendo queques de naranja a seis mil quinientos colones y galletas de avena a dos mil quinientos.",
+  "provider": "google-stt-v1",
+  "language": "es-cr",
+  "confidence": 0.91,
+  "duration_ms": 6400,
+  "latency_ms": 1830,
+  "billed_seconds": 7
+}

@@ -1,0 +1,18 @@
+{
+  "id": "00385a96-d328-465d-ae5e-5fbaee37707f",
+  "status": "pending",
+  "mode": "test",
+  "gateway": "mock",
+  "amount_minor": 2500000,
+  "currency": "CRC",
+  "lines": [
+    {
+      "product_id": "840501e1-364b-4fe2-9cca-dffdb43056b5",
+      "name": "Caja de regalo con chocolates",
+      "quantity": 2,
+      "unit_price_minor": 1250000,
+      "subtotal_minor": 2500000
+    }
+  ],
+  "notice": "Pago de prueba: no se cobra dinero real. Los pagos reales se activan cuando el comercio conecte un proveedor autorizado."
+}

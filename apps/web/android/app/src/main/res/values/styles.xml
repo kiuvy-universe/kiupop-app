@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <style name="KiuPopLaunchBase" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
+
+    <!-- Displayed until Flutter paints the first frame. -->
+    <style name="LaunchTheme" parent="KiuPopLaunchBase">
+        <item name="android:windowBackground">@drawable/launch_background</item>
+    </style>
+    <style name="NormalTheme" parent="@android:style/Theme.Light.NoTitleBar">
+        <item name="android:windowBackground">@color/kiupop_splash_background</item>
+    </style>
+</resources>

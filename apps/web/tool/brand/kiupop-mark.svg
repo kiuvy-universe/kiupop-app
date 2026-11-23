@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" role="img" aria-label="Kiuvy">
+  <rect width="120" height="120" fill="#FFFFFF"/>
+  <g transform="rotate(-22 60 62)">
+    <ellipse cx="54" cy="63" rx="38" ry="26" fill="none" stroke="#8F45CD" stroke-width="14"/>
+  </g>
+  <circle cx="99" cy="26" r="9" fill="#8F45CD"/>
+</svg>

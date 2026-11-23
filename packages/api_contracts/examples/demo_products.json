@@ -1,0 +1,12 @@
+{
+  "data": [
+    {
+      "id": "demo-cafe",
+      "name": "Café de altura 340 g",
+      "description": "Producto ficticio de demostración.",
+      "price_minor": 450000,
+      "currency": "CRC"
+    }
+  ],
+  "source": "postgres"
+}

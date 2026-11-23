@@ -1,0 +1,12 @@
+{
+  "store": {
+    "id": "6f1d2c3b-4a59-4e8f-9a0b-1c2d3e4f5a6b",
+    "slug": "flores-de-occidente",
+    "name": "Flores de Occidente",
+    "description": "Flores frescas en San Ramón.",
+    "whatsapp": "50600000001"
+  },
+  "admin_token": "kp_example_only_not_a_real_credential_00000",
+  "public_path": "/s/flores-de-occidente",
+  "features": { "ai": true }
+}

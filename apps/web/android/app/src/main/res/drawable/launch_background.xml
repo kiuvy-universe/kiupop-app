@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@color/kiupop_splash_background" />
+    <item android:drawable="@drawable/ic_kiupop_splash"
+        android:width="148dp"
+        android:height="148dp"
+        android:gravity="center" />
+</layer-list>

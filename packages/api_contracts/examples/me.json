@@ -1,0 +1,18 @@
+{
+  "auth_mode": "emulator",
+  "features": {
+    "ai": false
+  },
+  "stores": [
+    {
+      "slug": "floreria-bella-2",
+      "name": "Florería Bella",
+      "status": "published"
+    }
+  ],
+  "user": {
+    "email": "ex1795358828@example.test",
+    "name": "",
+    "provider": "password"
+  }
+}

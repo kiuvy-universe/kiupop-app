@@ -1,0 +1,96 @@
+{
+  "store": {
+    "slug": "floreria-bella-30",
+    "name": "Florería Bella",
+    "tagline": "Pedidos por WhatsApp · Entregas en Naranjo y San Ramón",
+    "description": "Arreglo de girasoles, ramo de rosas y caja de regalo con chocolates. Entregas en Naranjo y San Ramón.",
+    "category": "flores",
+    "status": "published",
+    "cover_url": null
+  },
+  "theme": {
+    "template": "bubblegum_pink",
+    "colors": {
+      "primary": "#C2185B",
+      "on_primary": "#FFFFFF",
+      "secondary": "#FFD1E3",
+      "background": "#FFF5F9",
+      "surface": "#FFFFFF",
+      "text": "#2B1320",
+      "muted": "#7A4A60",
+      "accent": "#FF6FA5"
+    },
+    "typography": {
+      "style": "elegant",
+      "heading_weight": 700,
+      "scale": 1
+    },
+    "radius": 20,
+    "spacing": "comfortable",
+    "card_style": "soft",
+    "button_style": "pill",
+    "hero": {
+      "style": "gradient"
+    },
+    "sections": [
+      "hero",
+      "catalog",
+      "delivery",
+      "contact"
+    ]
+  },
+  "products": [
+    {
+      "id": "2c52b2c4-b84c-4be2-ab0c-602070066a96",
+      "name": "Caja de regalo con chocolates",
+      "description": "",
+      "price_minor": 1250000,
+      "currency": "CRC",
+      "image_url": null,
+      "featured": true
+    },
+    {
+      "id": "4e896f1a-e89e-4eeb-9740-ab833de0bf9f",
+      "name": "Arreglo de girasoles",
+      "description": "",
+      "price_minor": 1800000,
+      "currency": "CRC",
+      "image_url": null,
+      "featured": true
+    },
+    {
+      "id": "f2f5993b-6ae0-40a3-a687-371ebc19445c",
+      "name": "Ramo de rosas",
+      "description": "",
+      "price_minor": 1500000,
+      "currency": "CRC",
+      "image_url": null,
+      "featured": true
+    }
+  ],
+  "delivery": {
+    "modes": [
+      "delivery"
+    ],
+    "zones": [
+      "Naranjo",
+      "San Ramón"
+    ],
+    "notes": ""
+  },
+  "contact": {
+    "whatsapp_url": "https://wa.me/50688881234",
+    "instagram": "",
+    "facebook": ""
+  },
+  "payments": {
+    "checkout": "test",
+    "real_payments_enabled": false,
+    "methods_to_coordinate": []
+  },
+  "share": {
+    "url": "http://localhost:8080/p/floreria-bella-30",
+    "title": "Florería Bella",
+    "text": "Mirá la tienda de Florería Bella en KiuPop"
+  }
+}

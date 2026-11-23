@@ -1,0 +1,7 @@
+.git
+.env
+.env.*
+!.env.example
+apps/web/build
+apps/web/.dart_tool
+**/node_modules

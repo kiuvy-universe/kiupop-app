@@ -1,0 +1,46 @@
+name: kiupop
+description: "KiuPop — tu tienda online en minutos."
+publish_to: 'none'
+version: 0.1.0+1
+
+environment:
+  sdk: ^3.13.7
+
+dependencies:
+  audioplayers: ^6.8.1
+  file_picker: ^13.4.1
+  firebase_auth: ^7.1.0
+  firebase_core: ^5.2.0
+  flutter:
+    sdk: flutter
+  flutter_localizations:
+    sdk: flutter
+  go_router: ^18.1.4
+  http: ^1.6.0
+  image_picker: ^1.2.4
+  intl: ^0.20.3
+  record: ^7.2.0
+  share_plus: ^13.3.1
+  shared_preferences: ^2.5.6
+  speech_to_text: ^7.5.0
+  url_launcher: ^6.3.3
+  web: ^1.1.2
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+  assets:
+    - assets/brand/kiupop-mark.png
+
+  # Plus Jakarta Sans, the same typeface as kiuvy.com. Open license (OFL 1.1, see
+  # assets/fonts/OFL-PlusJakartaSans.txt). Bundled, so no runtime download and it
+  # works offline. Variable font: one file covers weights 200-800.
+  fonts:
+    - family: PlusJakartaSans
+      fonts:
+        - asset: assets/fonts/PlusJakartaSans.ttf

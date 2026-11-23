@@ -1,0 +1,94 @@
+# KiuPop local stack. Run through the Makefile from the repo root:
+#   make up / make down / make logs
+# Project name "kiupop" keeps containers, network and volume isolated from Kiuvy.
+name: kiupop
+
+services:
+  postgres:
+    image: postgres:18.6-alpine3.24
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB:-kiupop}
+      POSTGRES_USER: ${POSTGRES_USER:-kiupop}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-kiupop_local_only}
+    ports:
+      - "127.0.0.1:${POSTGRES_HOST_PORT:-5433}:5432"   # loopback only
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+    networks: [backend]
+
+  auth-emulator:
+    build:
+      context: ./auth-emulator
+    image: kiupop-auth-emulator:local
+    restart: unless-stopped
+    stop_grace_period: 20s   # lets the emulator export accounts on stop
+    ports:
+      - "127.0.0.1:${AUTH_EMULATOR_HOST_PORT:-9199}:9099"   # loopback only; 9199 avoids Kiuvy's 9099
+    volumes:
+      - authdata:/data
+    networks: [backend]
+
+  api:
+    build:
+      context: ../backend
+      args:
+        APP_VERSION: ${APP_VERSION:-dev}
+    image: kiupop-api:local
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+      auth-emulator:
+        condition: service_healthy
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_VERSION: ${APP_VERSION:-dev}
+      API_HOST: 0.0.0.0          # inside the container; published on loopback below
+      API_PORT: "8080"
+      DATABASE_URL: postgres://${POSTGRES_USER:-kiupop}:${POSTGRES_PASSWORD:-kiupop_local_only}@postgres:5432/${POSTGRES_DB:-kiupop}?sslmode=disable
+      MOCK_MODE: ${MOCK_MODE:-true}
+      KIUVY_INTEGRATION_ENABLED: ${KIUVY_INTEGRATION_ENABLED:-false}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:3000,http://127.0.0.1:3000}
+      MIGRATE_ON_START: "true"
+      STORE_SIGNUP_ENABLED: ${STORE_SIGNUP_ENABLED:-true}
+      UPLOAD_DIR: /data/uploads
+      # KiuPop AI: off unless AI_ENABLED=true AND a key is present in .env (never committed).
+      AI_ENABLED: ${AI_ENABLED:-false}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      ANTHROPIC_MODEL: ${ANTHROPIC_MODEL:-claude-opus-5-5}
+      # Kiu ModelRouter tiers and per-store AI budget (micro-USD).
+      AI_MODEL_FAST: ${AI_MODEL_FAST:-claude-haiku-5-5}
+      AI_MODEL_SMART: ${AI_MODEL_SMART:-claude-sonnet-5-5}
+      AI_MODEL_PREMIUM: ${AI_MODEL_PREMIUM:-claude-opus-5-5}
+      AI_SESSION_BUDGET_MICROS: ${AI_SESSION_BUDGET_MICROS:-60000}
+      AI_USER_DAILY_BUDGET_MICROS: ${AI_USER_DAILY_BUDGET_MICROS:-300000}
+      AI_GLOBAL_DAILY_BUDGET_MICROS: ${AI_GLOBAL_DAILY_BUDGET_MICROS:-5000000}
+      # Identity: local Firebase Auth emulator (unsigned tokens; config fails closed outside local/development).
+      AUTH_PROVIDER: ${AUTH_PROVIDER:-emulator}
+      FIREBASE_PROJECT_ID: ${FIREBASE_PROJECT_ID:-demo-kiupop}
+      FIREBASE_AUTH_EMULATOR_HOST: auth-emulator:9099
+      PUBLIC_API_BASE: ${PUBLIC_API_BASE:-http://localhost:8080}
+      PUBLIC_WEB_BASE: ${PUBLIC_WEB_BASE:-http://localhost:3000}
+      PAYMENTS_TEST_CHECKOUT: ${PAYMENTS_TEST_CHECKOUT:-true}
+      AGENT_WORKERS: ${AGENT_WORKERS:-4}
+      KIU_DISCOVERY_ENABLED: ${KIU_DISCOVERY_ENABLED:-true}
+      PAYWALL_ENABLED: ${PAYWALL_ENABLED:-true}
+    volumes:
+      - uploads:/data/uploads
+    ports:
+      - "127.0.0.1:${API_HOST_PORT:-8080}:8080"         # loopback only
+    networks: [backend]
+
+volumes:
+  pgdata:
+  uploads:
+  authdata:
+
+networks:
+  backend:

@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="kiupop_icon_background">#FFFFFF</color>
+    <color name="kiupop_splash_background">#FBF5EB</color>
+    <color name="kiupop_splash_mark">#8F45CD</color>
+</resources>

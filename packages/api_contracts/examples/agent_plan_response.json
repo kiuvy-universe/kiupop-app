@@ -1,0 +1,17 @@
+{
+  "required": true,
+  "active": true,
+  "price_minor": 500,
+  "currency": "USD",
+  "interval": "month",
+  "mode": "test",
+  "plan": {
+    "plan": "kiupop_monthly",
+    "status": "active",
+    "price_minor": 500,
+    "currency": "USD",
+    "test": true,
+    "current_period_end": "2026-12-22T20:30:00Z"
+  },
+  "notice": "Modo prueba: no se cobra dinero real."
+}

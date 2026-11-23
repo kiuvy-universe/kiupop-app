@@ -1,0 +1,11 @@
+{
+  "store": { "slug": "flores-de-occidente", "name": "Flores de Occidente" },
+  "lines": [
+    { "product_id": "11111111-1111-4111-8111-111111111111", "name": "Rosa roja", "quantity": 2, "unit_price_minor": 100000, "subtotal_minor": 200000 },
+    { "product_id": "22222222-2222-4222-8222-222222222222", "name": "Arreglo pequeño", "quantity": 1, "unit_price_minor": 500000, "subtotal_minor": 500000 }
+  ],
+  "total_minor": 700000,
+  "currency": "CRC",
+  "message": "Hola, quiero realizar este pedido en Flores de Occidente:\n\n2 × Rosa roja — ₡2.000\n1 × Arreglo pequeño — ₡5.000\n\nTotal: ₡7.000\n\n¿Me pueden confirmar disponibilidad?",
+  "whatsapp_url": "https://wa.me/50600000001?text=Hola%2C%20quiero%20realizar%20este%20pedido%20en%20Flores%20de%20Occidente%3A%0A%0A2%20%C3%97%20Rosa%20roja%20%E2%80%94%20%E2%82%A12.000%0A1%20%C3%97%20Arreglo%20peque%C3%B1o%20%E2%80%94%20%E2%82%A15.000%0A%0ATotal%3A%20%E2%82%A17.000%0A%0A%C2%BFMe%20pueden%20confirmar%20disponibilidad%3F"
+}
